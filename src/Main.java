@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -17,13 +16,9 @@ public class Main {
 		System.out.println("Server listening on port " + socket.getLocalPort());
 
 		while (true) {
-			Socket clientSocket = socket.accept();
+			Socket client = socket.accept();
 
-			PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
-			writer.println("Hello from the server!");
-			writer.flush();
-
-			clientSocket.close();
+			Thread clientHandler = new Thread(new ClientHandler(client));
 		}
 	}
 }
