@@ -18,7 +18,7 @@ public class Main {
 		while (true) {
 			Socket client = socket.accept();
 
-			Thread clientHandler = new Thread(new ClientHandler(client));
+			new Thread(new ClientHandler(client)).start();
 		}
 	}
 }
