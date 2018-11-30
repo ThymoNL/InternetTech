@@ -7,6 +7,8 @@ public class Main {
 
 	private ServerSocket socket;
 
+	private String[] users;
+
 	public static void main(String[] args) throws IOException {
 		new Main().run();
 	}
