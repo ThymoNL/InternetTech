@@ -17,14 +17,14 @@ public class ClientCommands {
 		return data.split(" ");
 	}
 
-	public String helo(String data) {
+	public String helo(String data) throws UnexpectedCommandException {
 		String[] command = decode(data);
 
 		if (command[0].equals("HELO")) {
 			return command[1];
 		}
 
-		return null;
+		throw new UnexpectedCommandException("Expected HELO");
 	}
 
 

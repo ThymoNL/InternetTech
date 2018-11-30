@@ -1,5 +1,6 @@
 import protocol.ClientCommands;
 import protocol.ServerCommands;
+import protocol.UnexpectedCommandException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class ClientHandler implements Runnable {
 			//proto.dscn("Not Implemented");
 
 			client.close();
-		} catch (IOException | InterruptedException e) {
+		} catch (IOException | InterruptedException | UnexpectedCommandException e) {
 			e.printStackTrace();
 		}
 	}
