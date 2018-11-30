@@ -39,12 +39,17 @@ public class ClientHandler implements Runnable {
 			username = parser.helo(proto.receive());
 			proto.ok();
 			System.out.println(username + " logged in.");
+			System.out.println(username + " says: " + parser.bcst(proto.receive()));
 			Thread.sleep(10000);
-			//proto.dscn("Not Implemented");
+			proto.dscn("Not Implemented");
 
 			client.close();
 		} catch (IOException | InterruptedException | UnexpectedCommandException e) {
 			e.printStackTrace();
 		}
 	}
+
+	/*private void disconnect(String reason) {
+
+	}*/
 }
