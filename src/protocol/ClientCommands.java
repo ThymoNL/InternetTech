@@ -14,9 +14,7 @@ public class ClientCommands {
 	}
 
 	private String[] decode(String data) {
-		String[] command = data.split(" ");
-
-		return command;
+		return data.split(" ");
 	}
 
 	public String helo(String data) {
