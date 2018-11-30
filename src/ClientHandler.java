@@ -36,17 +36,36 @@ public class ClientHandler implements Runnable {
 
 		try {
 			proto.helo(MOTD);
-			username = parser.helo(proto.receive());
+			username = parser.helo(receive());
 			proto.ok();
 			System.out.println(username + " logged in.");
-			System.out.println(username + " says: " + parser.bcst(proto.receive()));
-			Thread.sleep(10000);
-			proto.dscn("Not Implemented");
+
+			boolean disconnect = false;
+			while (!disconnect) {
+				String data = receive();
+				String commandType = data.split(" ")[0];
+
+				if (commandType.equals("BCST")) {
+					System.out.println(username + " says: " + parser.bcst(receive()));
+				} else if (commandType.equals("QUIT")) {
+					proto.okPlain("Goodbye");
+					disconnect = true;
+				} else {
+					throw new UnexpectedCommandException("BCST or QUIT", commandType);
+				}
+			}
 
 			client.close();
-		} catch (IOException | InterruptedException | UnexpectedCommandException e) {
+		} catch (IOException | UnexpectedCommandException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private String receive() throws IOException {
+		String line = in.readLine();
+		proto.setLastCommand(line);
+
+		return line;
 	}
 
 	/*private void disconnect(String reason) {

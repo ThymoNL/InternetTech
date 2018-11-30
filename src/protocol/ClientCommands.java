@@ -14,7 +14,7 @@ public class ClientCommands {
 	}
 
 	private String[] decode(String data) {
-		return data.split(" ");
+		return data.split(" ", 2);
 	}
 
 	private String command(String command, String data) throws UnexpectedCommandException {
@@ -23,7 +23,7 @@ public class ClientCommands {
 		if (decoded[0].equals(command))
 			return decoded[1];
 
-		throw new UnexpectedCommandException("Expected " + command);
+		throw new UnexpectedCommandException(command, decoded[0]);
 	}
 
 	public String helo(String data) throws UnexpectedCommandException {

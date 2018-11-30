@@ -32,16 +32,14 @@ public class ServerCommands {
 		}
 	}
 
+	public void setLastCommand(String lastCommand) {
+		this.lastCommand = lastCommand;
+	}
+
 	private void send(String cmd) {
 		System.out.println("Sending: " + cmd);
 		out.println(cmd);
 		out.flush();
-	}
-
-	public String receive() throws IOException {
-		lastCommand = in.readLine();
-
-		return lastCommand;
 	}
 
 	public void helo(String motd) {
@@ -58,6 +56,10 @@ public class ServerCommands {
 		byte[] encoded = base64.encode(md5.digest(data.getBytes()));
 
 		send("+OK " + new String(encoded));
+	}
+
+	public void okPlain(String data) {
+		send("+OK " + data);
 	}
 
 	public void dscn(String reason) {
