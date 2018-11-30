@@ -17,15 +17,20 @@ public class ClientCommands {
 		return data.split(" ");
 	}
 
-	public String helo(String data) throws UnexpectedCommandException {
-		String[] command = decode(data);
+	private String command(String command, String data) throws UnexpectedCommandException {
+		String[] decoded = decode(data);
 
-		if (command[0].equals("HELO")) {
-			return command[1];
-		}
+		if (decoded[0].equals(command))
+			return decoded[1];
 
-		throw new UnexpectedCommandException("Expected HELO");
+		throw new UnexpectedCommandException("Expected " + command);
 	}
 
+	public String helo(String data) throws UnexpectedCommandException {
+		return command("HELO", data);
+	}
 
+	public String bcst(String data) throws UnexpectedCommandException {
+		return command("BCST", data);
+	}
 }
