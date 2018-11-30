@@ -21,6 +21,7 @@ public class Main {
 			Socket client = socket.accept();
 
 			new Thread(new ClientHandler(client)).start();
+			new Thread(new Pinger(client)).start();
 		}
 	}
 }
