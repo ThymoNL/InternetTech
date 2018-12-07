@@ -28,7 +28,7 @@ public class ClientPool {
 		for (int i = 0; i < clients.size(); i++) {
 			ClientHandler client = clients.get(i);
 
-			if (!client.equals(sender) || true) {
+			if (!client.equals(sender)) {
 				client.broadcast(sender.getUsername(), msg);
 			}
 		}

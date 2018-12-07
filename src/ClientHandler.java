@@ -59,6 +59,7 @@ public class ClientHandler implements Runnable {
 				if (commandType.equals("BCST")) {
 					String msg = parser.bcst(data);
 					System.out.println(username + " says: " + msg);
+					proto.ok();
 					pool.tellAll(this, msg);
 				} else if (commandType.equals("QUIT")) {
 					proto.okPlain("Goodbye");
