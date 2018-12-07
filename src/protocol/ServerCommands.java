@@ -62,6 +62,10 @@ public class ServerCommands {
 		send("+OK " + data);
 	}
 
+	public void bcst(String user, String msg) {
+		send("BCST " + user + " " + msg);
+	}
+
 	public void dscn(String reason) {
 		send("DSCN " + reason);
 	}
