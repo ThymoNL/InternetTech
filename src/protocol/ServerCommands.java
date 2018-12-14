@@ -69,4 +69,8 @@ public class ServerCommands {
 	public void dscn(String reason) {
 		send("DSCN " + reason);
 	}
+
+	public void err(String reason) {
+		send("-ERR " + reason);
+	}
 }

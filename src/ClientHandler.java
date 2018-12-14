@@ -17,7 +17,7 @@ public class ClientHandler implements Runnable {
 	private ClientCommands parser;
 	private ServerCommands proto;
 	private Pinger pinger;
-
+	private String regularExpression = "^([A-Za-z0-9_]+)";
 	private String username;
 
 	ClientHandler(Socket client) {
@@ -43,9 +43,15 @@ public class ClientHandler implements Runnable {
 		try {
 			proto.helo(MOTD);
 			username = parser.helo(receive()); // Wait for login
-			proto.ok();
-			new Thread(pinger).start();
-			System.out.println(username + " logged in.");
+
+			if (username.matches(regularExpression)) {
+				proto.ok();
+				new Thread(pinger).start();
+				System.out.println(username + " logged in.");
+			} else {
+				System.out.println("Username has invalid signs");
+
+			}
 
 			boolean disconnect = false;
 			while (!disconnect) {
