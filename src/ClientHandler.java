@@ -27,6 +27,7 @@ public class ClientHandler implements Runnable {
 			this.parser = ClientCommands.getParser();
 			this.proto = new ServerCommands(client.getInputStream(), client.getOutputStream());
 			this.pinger = new Pinger(client, in);
+			this.cb = cb;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

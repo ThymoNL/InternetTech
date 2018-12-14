@@ -15,6 +15,7 @@ public class Main {
 
 	private void run() throws IOException {
 		socket = new ServerSocket(PORT);
+		pool = new ClientPool();
 		System.out.println("Server listening on port " + socket.getLocalPort());
 
 		while (true) {
