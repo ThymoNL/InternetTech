@@ -32,7 +32,7 @@ public class Pinger implements Runnable {
 			PrintWriter out = new PrintWriter(socket.getOutputStream());
 
 			while (ping && socket.isConnected()) {
-				pongTime = -1;
+				pongTime = -1; // Reset timer to something we know is invalid
 				Thread.sleep(60 * 1000);
 
 				out.println("PING");
@@ -41,7 +41,7 @@ public class Pinger implements Runnable {
 
 				Thread.sleep(3 * 1000);
 				if (pongTime == -1 || pongTime - pingTime > TIMEOUT) {
-					System.out.println("DISCONNECT PING TIMEOUT");
+					//TODO: Disconnect client
 					ping = false;
 				}
 			}

@@ -7,6 +7,8 @@ public class Main {
 
 	private ServerSocket socket;
 
+	private ClientPool pool;
+
 	public static void main(String[] args) throws IOException {
 		new Main().run();
 	}
@@ -18,8 +20,32 @@ public class Main {
 		while (true) {
 			Socket client = socket.accept();
 
-			new Thread(new ClientHandler(client)).start();
-			//new Thread(new Pinger(client)).start();
+			ClientHandler handler = new ClientHandler(client, new Callback() {
+				@Override
+				public void onDisconnect(Object o) {
+					pool.remove((ClientHandler) o);
+				}
+
+				@Override
+				public void onBroadcast(Object o, String msg) {
+					pool.tellAll((ClientHandler) o, msg);
+				}
+			});
+
+			pool.add(handler);
+			new Thread(handler).start();
 		}
+	}
+
+	private void removeClient(ClientHandler client) {
+		pool.remove(client);
+	}
+
+	private void addClient(ClientHandler client) {
+		pool.add(client);
+	}
+
+	private void broadcast(String msg, ClientHandler sender) {
+
 	}
 }

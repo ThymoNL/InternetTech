@@ -9,22 +9,21 @@ import java.net.Socket;
 
 public class ClientHandler implements Runnable {
 	private static final String MOTD = "(>'-')> <('-'<) ^('-')^ v('-')v(>'-')> (^-^)";
+	private static final String regularExpression = "^([A-Za-z0-9_]+)";
 
 	private Socket client;
 	private BufferedReader in;
 
-	private ClientPool pool;
+	private Callback cb;
 	private ClientCommands parser;
 	private ServerCommands proto;
 	private Pinger pinger;
-	private String regularExpression = "^([A-Za-z0-9_]+)";
 	private String username;
 
-	ClientHandler(Socket client) {
+	ClientHandler(Socket client, Callback cb) {
 		this.client = client;
 		try {
 			this.in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-			this.pool = ClientPool.getPool();
 			this.parser = ClientCommands.getParser();
 			this.proto = new ServerCommands(client.getInputStream(), client.getOutputStream());
 			this.pinger = new Pinger(client, in);
@@ -38,7 +37,6 @@ public class ClientHandler implements Runnable {
 		if (in == null)
 			return; // No connection. Do nothing.
 
-		pool.add(this);
 
 		try {
 			proto.helo(MOTD);
@@ -62,20 +60,24 @@ public class ClientHandler implements Runnable {
 
 				String commandType = data.split(" ")[0];
 
-				if (commandType.equals("BCST")) {
-					String msg = parser.bcst(data);
-					System.out.println(username + " says: " + msg);
-					proto.ok();
-					pool.tellAll(this, msg);
-				} else if (commandType.equals("QUIT")) {
-					proto.okPlain("Goodbye");
-					disconnect = true;
-				} else if (commandType.equals("PONG")) {
-					pinger.pong();
+				switch (commandType) {
+					case "BCST":
+						String msg = parser.bcst(data);
+						System.out.println(username + " says: " + msg);
+						cb.onBroadcast(this, msg);
+						proto.ok();
+						break;
+					case "QUIT":
+						disconnect = true;
+						proto.okPlain("Goodbye");
+						break;
+					case "PONG":
+						pinger.pong();
+						break;
 				}
 			}
 
-			pool.remove(this);
+			cb.onDisconnect(this);
 			client.close();
 		} catch (IOException | UnexpectedCommandException e) {
 			e.printStackTrace();
