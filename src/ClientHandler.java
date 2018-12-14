@@ -48,7 +48,7 @@ public class ClientHandler implements Runnable {
 				new Thread(pinger).start();
 				System.out.println(username + " logged in.");
 			} else {
-				System.out.println("Username has invalid signs");
+				proto.err("username has an invalid format");
 
 			}
 
