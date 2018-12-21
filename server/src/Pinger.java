@@ -9,13 +9,15 @@ public class Pinger implements Runnable {
 
 	private Socket socket;
 	private InputStream is;
+	private PingTimeout cb;
 
 	private long pongTime;
 
-	public Pinger(Socket socket, BufferedReader in) {
+	public Pinger(Socket socket, BufferedReader in, PingTimeout cb) {
 		try {
 			this.socket = socket;
 			this.is = socket.getInputStream();
+			this.cb = cb;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -33,7 +35,7 @@ public class Pinger implements Runnable {
 
 			while (ping && socket.isConnected()) {
 				pongTime = -1; // Reset timer to something we know is invalid
-				Thread.sleep(60 * 1000);
+				Thread.sleep(6 * 1000);
 
 				out.println("PING");
 				out.flush();
@@ -41,7 +43,7 @@ public class Pinger implements Runnable {
 
 				Thread.sleep(3 * 1000);
 				if (pongTime == -1 || pongTime - pingTime > TIMEOUT) {
-					//TODO: Disconnect client
+					cb.onTimeout();
 					ping = false;
 				}
 			}

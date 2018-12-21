@@ -5,17 +5,10 @@ import java.net.Socket;
 public class Main {
 	private static final int PORT = 1337;
 
-	private ServerSocket socket;
-
-	private ClientPool pool;
+	private static ClientPool pool = new ClientPool();
 
 	public static void main(String[] args) throws IOException {
-		new Main().run();
-	}
-
-	private void run() throws IOException {
-		socket = new ServerSocket(PORT);
-		pool = new ClientPool();
+		ServerSocket socket = new ServerSocket(PORT);
 		System.out.println("Server listening on port " + socket.getLocalPort());
 
 		while (true) {
