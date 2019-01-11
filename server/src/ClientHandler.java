@@ -38,7 +38,6 @@ public class ClientHandler implements Runnable {
 		if (in == null)
 			return; // No connection. Do nothing.
 
-
 		try {
 			proto.helo(MOTD);
 			username = parser.helo(receive()); // Wait for login

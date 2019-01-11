@@ -2,7 +2,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Main {
+public class Server {
 	private static final int PORT = 1337;
 
 	private static ClientPool pool = new ClientPool();
@@ -10,6 +10,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		ServerSocket socket = new ServerSocket(PORT);
 		System.out.println("Server listening on port " + socket.getLocalPort());
+		int threadCount = 0;
 
 		while (true) {
 			Socket client = socket.accept();
@@ -27,7 +28,7 @@ public class Main {
 			});
 
 			pool.add(handler);
-			new Thread(handler).start();
+			new Thread(handler, "Client" + ++threadCount).start();
 		}
 	}
 

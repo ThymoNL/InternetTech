@@ -35,7 +35,7 @@ public class Pinger implements Runnable {
 
 			while (ping && socket.isConnected()) {
 				pongTime = -1; // Reset timer to something we know is invalid
-				Thread.sleep(6 * 1000);
+				Thread.sleep(60 * 1000);
 
 				out.println("PING");
 				out.flush();
