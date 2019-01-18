@@ -1,5 +1,7 @@
 package protocol;
 
+import com.sun.deploy.util.SessionState;
+
 import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -72,5 +74,9 @@ public class ServerCommands {
 
 	public void err(String reason) {
 		send("-ERR " + reason);
+	}
+
+	public void lsu(){
+		
 	}
 }

@@ -6,10 +6,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClientHandler implements Runnable {
 	private static final String MOTD = "(>'-')> <('-'<) ^('-')^ v('-')v(>'-')> (^-^)";
 	private static final String regularExpression = "^([A-Za-z0-9_]+)";
+	//java –jar inettech_chat_client.jar –-no-colors
 
 	private Socket client;
 	private BufferedReader in;
@@ -19,6 +22,7 @@ public class ClientHandler implements Runnable {
 	private ServerCommands proto;
 	private Pinger pinger;
 	private String username;
+
 
 	ClientHandler(Socket client, Callback cb) {
 		this.client = client;
@@ -48,7 +52,6 @@ public class ClientHandler implements Runnable {
 				System.out.println(username + " logged in.");
 			} else {
 				proto.err("username has an invalid format");
-
 			}
 
 			boolean disconnect = false;
