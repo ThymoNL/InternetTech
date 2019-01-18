@@ -23,7 +23,6 @@ public class ClientHandler implements Runnable {
 	private Pinger pinger;
 	private String username;
 
-
 	ClientHandler(Socket client, Callback cb) {
 		this.client = client;
 		try {
@@ -77,6 +76,9 @@ public class ClientHandler implements Runnable {
 					case "PONG":
 						pinger.pong();
 						break;
+					case "LSU":
+						proto.lsu(username);
+						break;
 				}
 			}
 
@@ -104,7 +106,6 @@ public class ClientHandler implements Runnable {
 
 	private void disconnect(String reason) {
 		proto.dscn(reason);
-
 		try {
 			client.close();
 		} catch (IOException e) {

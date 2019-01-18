@@ -6,6 +6,7 @@ import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.List;
 
 public class ServerCommands {
 	private InputStream is;
@@ -76,7 +77,7 @@ public class ServerCommands {
 		send("-ERR " + reason);
 	}
 
-	public void lsu(){
-		
+	public void lsu(String username){
+		send("People online: \n" + username);
 	}
 }

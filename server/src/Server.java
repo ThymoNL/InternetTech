@@ -25,6 +25,14 @@ public class Server {
 				public void onBroadcast(Object o, String msg) {
 					pool.tellAll((ClientHandler) o, msg);
 				}
+
+				@Override
+				public String getClients(String user) {
+					for (int i = 0; i < pool.getClientList(user).length(); i++) {
+						user = pool.getClientList(user);
+					}
+					return user;
+				}
 			});
 
 			pool.add(handler);
