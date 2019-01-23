@@ -1,5 +1,7 @@
 package nl.saxion.hboict.internettech.client;
 
+import nl.saxion.hboict.internettech.client.protocol.ServerReplies;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,6 +13,7 @@ public class Client {
 	private Socket socket;
 	private BufferedReader in;
 	private OutputStream os;
+	private ServerReplies replies;
 
 	public static void main(String[] args) {
 		String host = "localhost";
@@ -55,6 +58,7 @@ public class Client {
 			socket = new Socket(host, port);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			os = socket.getOutputStream();
+			replies = new ServerReplies(os);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -71,8 +75,13 @@ public class Client {
 					System.out.println(line); //TODO: Add color
 				}
 
-				if ("PING".equals(line)) {
+				if (line.equals("PING")) {
 					send("PONG");
+				} else if (line.startsWith("DSCN")) {
+					socket.close();
+					break;
+				} else {
+					replies.parse(line);
 				}
 			}
 		} catch (IOException e) {
