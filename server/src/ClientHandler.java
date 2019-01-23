@@ -77,7 +77,8 @@ public class ClientHandler implements Runnable {
 						pinger.pong();
 						break;
 					case "LSU":
-						proto.lsu(username, username, username);
+						proto.lsu(username);
+						cb.getClients(username);
 						break;
 				}
 			}
