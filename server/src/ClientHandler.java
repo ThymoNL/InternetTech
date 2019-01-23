@@ -77,6 +77,7 @@ public class ClientHandler implements Runnable {
 						pinger.pong();
 						break;
 					case "LSU":
+						parser.lsu(username);
 						proto.lsu(username);
 						cb.getClients(username);
 						break;
@@ -112,5 +113,9 @@ public class ClientHandler implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void listOfAllUsers(String user){
+		proto.lsu(user);
 	}
 }
