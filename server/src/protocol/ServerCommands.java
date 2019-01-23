@@ -1,12 +1,9 @@
 package protocol;
 
-import com.sun.deploy.util.SessionState;
-
 import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.util.List;
 
 public class ServerCommands {
 	private InputStream is;
@@ -77,7 +74,18 @@ public class ServerCommands {
 		send("-ERR " + reason);
 	}
 
-	public void lsu(String user){
-		send("+OK "  + user + "," + user + "," + user);
+	public void lsu(String[] users) {
+		if (users == null)
+			throw new IllegalArgumentException();
+
+		StringBuilder userList = new StringBuilder();
+		for (int i = 0; i < users.length; i++) {
+			userList.append(users[i]);
+
+			if (i < users.length - 1)
+				userList.append(',');
+		}
+
+		send("+OK " + userList.toString());
 	}
 }

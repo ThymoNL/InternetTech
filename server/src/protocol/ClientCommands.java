@@ -33,8 +33,4 @@ public class ClientCommands {
 	public String bcst(String data) throws UnexpectedCommandException {
 		return command("BCST", data);
 	}
-
-	public String lsu(String user) throws UnexpectedCommandException{
-		return command("LSU", user);
-	}
 }

@@ -4,5 +4,5 @@ public interface Callback {
 
 	void onBroadcast(Object o, String msg);
 
-	String getClients(String user);
+	String[] getClients();
 }
