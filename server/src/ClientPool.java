@@ -12,12 +12,12 @@ class ClientPool {
 		clients.remove(client);
 	}
 
-	String getClientList(String user){
+	String getClientList(String user1,String user2,String user3){
 		for (int i = 0; i < clients.size(); i++) {
-			user = clients.get(i).toString();
-			System.out.println(user);
+			user1 = clients.get(i).toString();
+			System.out.println(user1);
 		}
-		return user;
+		return user1;
 	}
 
 	synchronized void tellAll(ClientHandler sender, String msg) {

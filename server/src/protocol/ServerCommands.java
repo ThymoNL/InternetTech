@@ -77,7 +77,7 @@ public class ServerCommands {
 		send("-ERR " + reason);
 	}
 
-	public void lsu(String username){
-		send("People online: \n" + username);
+	public void lsu(String user1, String user2, String user3){
+		send("+OK "  + "," + user1 + user2 + user3 /*user1,user2,user3*/);
 	}
 }

@@ -27,11 +27,11 @@ public class Server {
 				}
 
 				@Override
-				public String getClients(String user) {
-					for (int i = 0; i < pool.getClientList(user).length(); i++) {
-						user = pool.getClientList(user);
+				public String getClients(String user1, String user2, String user3) {
+					for (int i = 0; i < pool.getClientList(user1, user2, user3).length(); i++) {
+						user1 = pool.getClientList(user1, user2, user3);
 					}
-					return user;
+					return user1;
 				}
 			});
 
