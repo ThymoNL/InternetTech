@@ -30,7 +30,7 @@ public class ClientHandler implements Runnable {
 			this.in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			this.parser = ClientCommands.getParser();
 			this.proto = new ServerCommands(client.getOutputStream());
-			this.pinger = new Pinger(client, in, () -> disconnect("Pong timeout"));
+			this.pinger = new Pinger(client, () -> disconnect("Pong timeout"));
 			this.call = call;
 		} catch (IOException e) {
 			e.printStackTrace();

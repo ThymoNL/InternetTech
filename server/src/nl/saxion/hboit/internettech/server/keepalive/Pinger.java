@@ -11,19 +11,13 @@ public class Pinger implements Runnable {
 	private static final int TIMEOUT = 3000; // Max. pong reply time
 
 	private Socket socket;
-	private InputStream is;
 	private PingTimeout cb;
 
 	private long pongTime;
 
-	public Pinger(Socket socket, BufferedReader in, PingTimeout cb) {
-		try {
-			this.socket = socket;
-			this.is = socket.getInputStream();
-			this.cb = cb;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public Pinger(Socket socket, PingTimeout cb) {
+		this.socket = socket;
+		this.cb = cb;
 	}
 
 	public void pong() {
