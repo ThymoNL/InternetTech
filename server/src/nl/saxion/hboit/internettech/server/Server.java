@@ -11,7 +11,6 @@ public class Server {
 	private static final int PORT = 1337;
 
 	private static ClientPool pool = new ClientPool();
-
 	private static Map<String, Group> groups = new HashMap<>();
 
 	private static ServerCall serverCall = new ServerCall() {
@@ -59,7 +58,12 @@ public class Server {
 
 		@Override
 		public Set<String> getClients() {
-			return pool.getUsers();
+			return pool.getNames();
+		}
+
+		@Override
+		public Set<String> getGroups() {
+			return groups.keySet();
 		}
 	};
 

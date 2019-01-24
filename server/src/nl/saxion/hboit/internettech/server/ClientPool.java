@@ -15,7 +15,7 @@ class ClientPool {
 		clients.remove(client.getUsername());
 	}
 
-	synchronized Set<String> getUsers() {
+	synchronized Set<String> getNames() {
 		return clients.keySet();
 	}
 

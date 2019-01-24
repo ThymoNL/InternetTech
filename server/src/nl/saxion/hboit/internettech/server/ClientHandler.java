@@ -65,6 +65,13 @@ public class ClientHandler implements Runnable {
 
 				String command;
 				switch (commandType) {
+					case "QUIT":
+					disconnect = true;
+					proto.okPlain("Goodbye");
+					break;
+					case "PONG":
+					pinger.pong();
+					break;
 					case "BCST":
 						String msg = parser.bcst(data);
 						System.out.println(username + " says: " + msg);
@@ -74,35 +81,37 @@ public class ClientHandler implements Runnable {
 					case "LSU":
 						proto.lsu(call.getClients());
 						break;
-					case "QUIT":
-						disconnect = true;
-						proto.okPlain("Goodbye");
-						break;
-					case "PONG":
-						pinger.pong();
+					case "LSG":
+						proto.lsg(call.getGroups());
 						break;
 					case "DM":
 						command = parser.dm(data);
 						String[] dm = command.split(" ", 2);
 						if (call.onDirectMessage(this, dm[0], dm[1])) // Did we sent the message?
-							proto.ok(command);
-						else
-							proto.err("User does not exist");
+						{
+								proto.ok(command);
+						}
+						else {
+								proto.err("User does not exist");
+						}
 						break;
 					case "WSPR":
 						command = parser.wspr(data);
 						String[] wspr = command.split(" ", 2);
-						if (call.onGroupMessage(this, wspr[0], wspr[1]))
-							proto.ok(command);
-						else
-							proto.err("Group does not exist");
+						if (call.onGroupMessage(this, wspr[0], wspr[1])) {
+								proto.ok(command);
+						}
+						else {
+								proto.err("Group does not exist");
+						}
 						break;
 					case "MKG":
 						//TODO: Check format
 						if (call.onGroupAdd(this, parser.mkg(data)))
-							proto.ok(data);
+								proto.ok(data);
 						else
-							proto.err("Group exists");
+								proto.err("Group exists");
+						break;
 					default:
 						proto.err("Unknown command");
 				}

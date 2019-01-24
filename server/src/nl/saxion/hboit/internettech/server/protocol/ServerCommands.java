@@ -44,6 +44,19 @@ public class ServerCommands {
 		out.flush();
 	}
 
+	private String makeList(Set<String> set) {
+		StringBuilder list = new StringBuilder();
+		Iterator<String> itr = set.iterator();
+		while (itr.hasNext()) {
+			list.append(itr.next());
+
+			if (itr.hasNext())
+				list.append(',');
+		}
+
+		return list.toString();
+	}
+
 	public void helo(String motd) {
 		send("HELO " + motd);
 	}
@@ -76,20 +89,12 @@ public class ServerCommands {
 		send("-ERR " + reason);
 	}
 
-	public void lsu(Set<String> users) {
-		if (users == null)
-			throw new IllegalArgumentException();
+	public void lsu(Set<String> set) {
+		okPlain(makeList(set));
+	}
 
-		StringBuilder userList = new StringBuilder();
-		Iterator<String> itr = users.iterator();
-		while (itr.hasNext()) {
-			userList.append(itr.next());
-
-			if (itr.hasNext())
-				userList.append(',');
-		}
-
-		okPlain(userList.toString());
+	public void lsg(Set<String> set) {
+		okPlain(makeList(set));
 	}
 
 	public void dm(String sender, String msg) {

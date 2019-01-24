@@ -16,4 +16,6 @@ public interface ServerCall {
 	boolean onGroupMessage(ClientHandler client, String group, String msg);
 
 	Set<String> getClients();
+
+	Set<String> getGroups();
 }
