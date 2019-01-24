@@ -1,8 +1,11 @@
+import java.util.Set;
+
 public interface Callback {
+	void onLogin(ClientHandler client);
 
-	void onDisconnect(Object o);
+	void onDisconnect(ClientHandler client);
 
-	void onBroadcast(Object o, String msg);
+	void onBroadcast(ClientHandler client, String msg);
 
-	String[] getClients();
+	Set<String> getClients();
 }

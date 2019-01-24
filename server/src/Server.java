@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Set;
 
 public class Server {
 	private static final int PORT = 1337;
@@ -13,26 +14,30 @@ public class Server {
 		int threadCount = 0;
 
 		while (true) {
-			Socket client = socket.accept();
+			Socket clientSock = socket.accept();
 
-			ClientHandler handler = new ClientHandler(client, new Callback() {
+			ClientHandler handler = new ClientHandler(clientSock, new Callback() {
 				@Override
-				public void onDisconnect(Object o) {
-					pool.remove((ClientHandler) o);
+				public void onLogin(ClientHandler client) {
+					pool.add(client);
 				}
 
 				@Override
-				public void onBroadcast(Object o, String msg) {
-					pool.tellAll((ClientHandler) o, msg);
+				public void onDisconnect(ClientHandler client) {
+					pool.remove(client);
 				}
 
 				@Override
-				public String[] getClients() {
-					return pool.getClients();
+				public void onBroadcast(ClientHandler client, String msg) {
+					pool.tellAll(client, msg);
+				}
+
+				@Override
+				public Set<String> getClients() {
+					return pool.getUsers();
 				}
 			});
 
-			pool.add(handler);
 			new Thread(handler, "Client" + ++threadCount).start();
 		}
 	}

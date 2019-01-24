@@ -4,6 +4,8 @@ import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.Iterator;
+import java.util.Set;
 
 public class ServerCommands {
 	private InputStream is;
@@ -74,15 +76,16 @@ public class ServerCommands {
 		send("-ERR " + reason);
 	}
 
-	public void lsu(String[] users) {
+	public void lsu(Set<String> users) {
 		if (users == null)
 			throw new IllegalArgumentException();
 
 		StringBuilder userList = new StringBuilder();
-		for (int i = 0; i < users.length; i++) {
-			userList.append(users[i]);
+		Iterator<String> itr = users.iterator();
+		while (itr.hasNext()) {
+			userList.append(itr.next());
 
-			if (i < users.length - 1)
+			if (itr.hasNext())
 				userList.append(',');
 		}
 

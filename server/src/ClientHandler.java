@@ -44,6 +44,7 @@ public class ClientHandler implements Runnable {
 
 			if (username.matches(regularExpression)) {
 				proto.ok();
+				cb.onLogin(this);
 				new Thread(pinger).start();
 				System.out.println(username + " logged in.");
 			} else {
@@ -76,6 +77,8 @@ public class ClientHandler implements Runnable {
 					case "PONG":
 						pinger.pong();
 						break;
+					default:
+						proto.err("Unknown command");
 				}
 			}
 

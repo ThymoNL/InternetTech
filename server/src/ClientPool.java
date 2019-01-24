@@ -1,25 +1,18 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 class ClientPool {
-	private List<ClientHandler> clients = new ArrayList<>();
+	private Map<String, ClientHandler> clients = new HashMap<>();
 
 	void add(ClientHandler client) {
-		clients.add(client);
+		clients.put(client.getUsername(), client);
 	}
 
 	void remove(ClientHandler client) {
-		clients.remove(client);
+		clients.remove(client.getUsername());
 	}
 
-	String[] getClients(){
-		String[] users = new String[clients.size()];
-
-		for (int i = 0; i < clients.size(); i++) {
-			users[i] = clients.get(i).getUsername();
-		}
-
-		return users;
+	Set<String> getUsers() {
+		return clients.keySet();
 	}
 
 	synchronized void tellAll(ClientHandler sender, String msg) {
