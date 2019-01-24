@@ -45,4 +45,8 @@ public class ClientCommands {
 	public String mkg(String data) throws UnexpectedCommandException {
 		return command("MKG", data);
 	}
+
+	public String kick(String data) throws UnexpectedCommandException {
+		return command("KICK", data);
+	}
 }

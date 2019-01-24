@@ -13,7 +13,13 @@ public interface ServerCall {
 
 	boolean onGroupAdd(ClientHandler client, String name);
 
+	boolean onGroupJoin(ClientHandler client, String group);
+
+	boolean onGroupLeave(ClientHandler client, String group);
+
 	boolean onGroupMessage(ClientHandler client, String group, String msg);
+
+	boolean onGroupKick(ClientHandler client, String group, String kickUser) throws ClientNotOwnerException;
 
 	Set<String> getClients();
 

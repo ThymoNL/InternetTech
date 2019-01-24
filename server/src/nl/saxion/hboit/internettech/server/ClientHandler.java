@@ -24,13 +24,13 @@ public class ClientHandler implements Runnable {
 	private Pinger pinger;
 	private String username;
 
-	ClientHandler(Socket client, ServerCall call) {
+	ClientHandler(Socket client, ServerCall call, boolean ping) {
 		this.client = client;
 		try {
 			this.in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			this.parser = ClientCommands.getParser();
 			this.proto = new ServerCommands(client.getOutputStream());
-			this.pinger = new Pinger(client, () -> disconnect("Pong timeout"));
+			if (ping) this.pinger = new Pinger(client, () -> disconnect("Pong timeout"));
 			this.call = call;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -49,7 +49,7 @@ public class ClientHandler implements Runnable {
 			if (username.matches(regularExpression)) {
 				proto.ok();
 				call.onLogin(this);
-				new Thread(pinger).start();
+				if (pinger != null) new Thread(pinger).start();
 				System.out.println(username + " logged in.");
 			} else {
 				proto.err("username has an invalid format");
@@ -139,6 +139,10 @@ public class ClientHandler implements Runnable {
 
 	public synchronized void groupTell(String group, String sender, String msg) {
 		proto.wspr(group, sender, msg);
+	}
+
+	public void kick(String name, String kickedBy) {
+		proto.kick(name, kickedBy);
 	}
 
 	private String receive() throws IOException {

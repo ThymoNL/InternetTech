@@ -39,20 +39,49 @@ public class Server {
 			if (groups.get(name) != null)
 				return false;
 
-			Group group = new Group(name);
-			group.join(client);
+			Group group = new Group(client, name);
 			groups.put(name, group);
 			return true;
 		}
 
 		@Override
-		public boolean onGroupMessage(ClientHandler client, String name, String msg) {
-			Group group = groups.get(name);
+		public boolean onGroupJoin(ClientHandler client, String groupName) {
+			Group group = groups.get(groupName);
+
+			if (group == null) return false;
+
+			group.join(client);
+			return true;
+		}
+
+		@Override
+		public boolean onGroupLeave(ClientHandler client, String groupName) {
+			Group group = groups.get(groupName);
+
+			if (group == null) // TODO: Exception instead?
+				return false;
+
+			return group.leave(client);
+		}
+
+		@Override
+		public boolean onGroupMessage(ClientHandler client, String groupName, String msg) {
+			Group group = groups.get(groupName);
 
 			if (group == null)
 				return false;
 
 			group.tellAll(client, msg);
+			return true;
+		}
+
+		@Override
+		public boolean onGroupKick(ClientHandler client, String groupName, String kickUser) throws ClientNotOwnerException {
+			Group group = groups.get(groupName);
+
+			if (group == null) return false; //TODO: Exception instead?
+
+			group.kick(client, kickUser);
 			return true;
 		}
 
@@ -68,6 +97,10 @@ public class Server {
 	};
 
 	public static void main(String[] args) throws IOException {
+		boolean ping = true;
+		for (String arg : args)
+			ping = !arg.equals("--no-ping");
+
 		ServerSocket socket = new ServerSocket(PORT);
 		System.out.println("Server listening on port " + socket.getLocalPort());
 		int threadCount = 0;
@@ -76,7 +109,7 @@ public class Server {
 		while (true) {
 			Socket clientSock = socket.accept();
 
-			ClientHandler handler = new ClientHandler(clientSock, serverCall);
+			ClientHandler handler = new ClientHandler(clientSock, serverCall, ping);
 
 			new Thread(handler, "Client" + ++threadCount).start();
 		}

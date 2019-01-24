@@ -96,4 +96,8 @@ public class ServerCommands {
 	public void wspr(String group, String sender, String msg) {
 		send("WSPR " + group + " " + sender + " " + msg);
 	}
+
+	public void kick(String name, String kickedBy) {
+		send("KICK " + name + " "+ kickedBy);
+	}
 }
