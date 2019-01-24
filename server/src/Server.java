@@ -41,16 +41,4 @@ public class Server {
 			new Thread(handler, "Client" + ++threadCount).start();
 		}
 	}
-
-	private void removeClient(ClientHandler client) {
-		pool.remove(client);
-	}
-
-	private void addClient(ClientHandler client) {
-		pool.add(client);
-	}
-
-	private void broadcast(String msg, ClientHandler sender) {
-
-	}
 }
