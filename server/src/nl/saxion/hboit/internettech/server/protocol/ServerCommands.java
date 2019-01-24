@@ -8,10 +8,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class ServerCommands {
-	private InputStream is;
-	private BufferedReader in;
-
-	private OutputStream os;
 	private PrintWriter out;
 
 	private String lastCommand;
@@ -19,11 +15,7 @@ public class ServerCommands {
 	private MessageDigest md5;
 	private Base64.Encoder base64;
 
-	public ServerCommands(InputStream is, OutputStream os) {
-		this.is = is;
-		this.os = os;
-
-		this.in = new BufferedReader(new InputStreamReader(is));
+	public ServerCommands(OutputStream os) {
 		this.out = new PrintWriter(os);
 
 		try {

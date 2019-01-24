@@ -28,7 +28,7 @@ public class ClientHandler implements Runnable {
 		try {
 			this.in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			this.parser = ClientCommands.getParser();
-			this.proto = new ServerCommands(client.getInputStream(), client.getOutputStream());
+			this.proto = new ServerCommands(client.getOutputStream());
 			this.pinger = new Pinger(client, in, () -> disconnect("Pong timeout"));
 			this.call = call;
 		} catch (IOException e) {
@@ -66,12 +66,12 @@ public class ClientHandler implements Runnable {
 				String command;
 				switch (commandType) {
 					case "QUIT":
-					disconnect = true;
-					proto.okPlain("Goodbye");
-					break;
+						disconnect = true;
+						proto.okPlain("Goodbye");
+						break;
 					case "PONG":
-					pinger.pong();
-					break;
+						pinger.pong();
+						break;
 					case "BCST":
 						String msg = parser.bcst(data);
 						System.out.println(username + " says: " + msg);
@@ -88,29 +88,24 @@ public class ClientHandler implements Runnable {
 						command = parser.dm(data);
 						String[] dm = command.split(" ", 2);
 						if (call.onDirectMessage(this, dm[0], dm[1])) // Did we sent the message?
-						{
-								proto.ok(command);
-						}
-						else {
-								proto.err("User does not exist");
-						}
+							proto.ok(command);
+						else
+							proto.err("User does not exist");
 						break;
 					case "WSPR":
 						command = parser.wspr(data);
 						String[] wspr = command.split(" ", 2);
-						if (call.onGroupMessage(this, wspr[0], wspr[1])) {
-								proto.ok(command);
-						}
-						else {
-								proto.err("Group does not exist");
-						}
+						if (call.onGroupMessage(this, wspr[0], wspr[1]))
+							proto.ok(command);
+						else
+							proto.err("Group does not exist");
 						break;
 					case "MKG":
 						//TODO: Check format
 						if (call.onGroupAdd(this, parser.mkg(data)))
-								proto.ok(data);
+							proto.ok(data);
 						else
-								proto.err("Group exists");
+							proto.err("Group exists");
 						break;
 					default:
 						proto.err("Unknown command");
