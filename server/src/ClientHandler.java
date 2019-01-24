@@ -1,3 +1,4 @@
+import keepalive.Pinger;
 import protocol.ClientCommands;
 import protocol.ServerCommands;
 import protocol.UnexpectedCommandException;
