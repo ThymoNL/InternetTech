@@ -8,6 +8,28 @@ public class Server {
 
 	private static ClientPool pool = new ClientPool();
 
+	private static ServerCall serverCall = new ServerCall() {
+		@Override
+		public void onLogin(ClientHandler client) {
+			pool.add(client);
+		}
+
+		@Override
+		public void onDisconnect(ClientHandler client) {
+			pool.remove(client);
+		}
+
+		@Override
+		public void onBroadcast(ClientHandler client, String msg) {
+			pool.tellAll(client, msg);
+		}
+
+		@Override
+		public Set<String> getClients() {
+			return pool.getUsers();
+		}
+	};
+
 	public static void main(String[] args) throws IOException {
 		ServerSocket socket = new ServerSocket(PORT);
 		System.out.println("Server listening on port " + socket.getLocalPort());
@@ -17,27 +39,7 @@ public class Server {
 		while (true) {
 			Socket clientSock = socket.accept();
 
-			ClientHandler handler = new ClientHandler(clientSock, new ServerCall() {
-				@Override
-				public void onLogin(ClientHandler client) {
-					pool.add(client);
-				}
-
-				@Override
-				public void onDisconnect(ClientHandler client) {
-					pool.remove(client);
-				}
-
-				@Override
-				public void onBroadcast(ClientHandler client, String msg) {
-					pool.tellAll(client, msg);
-				}
-
-				@Override
-				public Set<String> getClients() {
-					return pool.getUsers();
-				}
-			});
+			ClientHandler handler = new ClientHandler(clientSock, serverCall);
 
 			new Thread(handler, "Client" + ++threadCount).start();
 		}
