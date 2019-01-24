@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ClientHandler implements Runnable {
 	private static final String MOTD = "(>'-')> <('-'<) ^('-')^ v('-')v(>'-')> (^-^)";
@@ -48,7 +49,7 @@ public class ClientHandler implements Runnable {
 			if (username.matches(regularExpression)) {
 				proto.ok();
 				call.onLogin(this);
-				//new Thread(pinger).start();
+				new Thread(pinger).start();
 				System.out.println(username + " logged in.");
 			} else {
 				proto.err("username has an invalid format");
@@ -56,7 +57,12 @@ public class ClientHandler implements Runnable {
 
 			boolean disconnect = false;
 			while (!disconnect) {
-				String data = receive();
+				String data;
+				try {
+					data = receive();
+				} catch (SocketException e) {
+					break;
+				}
 
 				if (data == null)
 					break; // Connection closed
