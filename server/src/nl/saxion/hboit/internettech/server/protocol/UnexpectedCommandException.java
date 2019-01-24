@@ -1,4 +1,4 @@
-package protocol;
+package nl.saxion.hboit.internettech.server.protocol;
 
 public class UnexpectedCommandException extends Exception {
 	public UnexpectedCommandException() {

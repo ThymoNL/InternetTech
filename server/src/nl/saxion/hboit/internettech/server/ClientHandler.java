@@ -1,7 +1,9 @@
-import keepalive.Pinger;
-import protocol.ClientCommands;
-import protocol.ServerCommands;
-import protocol.UnexpectedCommandException;
+package nl.saxion.hboit.internettech.server;
+
+import nl.saxion.hboit.internettech.server.keepalive.Pinger;
+import nl.saxion.hboit.internettech.server.protocol.ClientCommands;
+import nl.saxion.hboit.internettech.server.protocol.ServerCommands;
+import nl.saxion.hboit.internettech.server.protocol.UnexpectedCommandException;
 
 import java.io.BufferedReader;
 import java.io.IOException;

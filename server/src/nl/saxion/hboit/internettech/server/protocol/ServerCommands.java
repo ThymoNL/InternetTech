@@ -1,4 +1,4 @@
-package protocol;
+package nl.saxion.hboit.internettech.server.protocol;
 
 import java.io.*;
 import java.security.MessageDigest;

@@ -1,3 +1,5 @@
+package nl.saxion.hboit.internettech.server;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;

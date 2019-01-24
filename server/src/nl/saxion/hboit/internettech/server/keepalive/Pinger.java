@@ -1,4 +1,4 @@
-package keepalive;
+package nl.saxion.hboit.internettech.server.keepalive;
 
 import java.io.BufferedReader;
 import java.io.IOException;

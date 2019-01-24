@@ -1,3 +1,5 @@
+package nl.saxion.hboit.internettech.server;
+
 import java.util.Set;
 
 public interface ServerCall {
