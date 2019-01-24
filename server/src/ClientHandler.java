@@ -14,13 +14,13 @@ public class ClientHandler implements Runnable {
 	private Socket client;
 	private BufferedReader in;
 
-	private Callback cb;
+	private ServerCall cb;
 	private ClientCommands parser;
 	private ServerCommands proto;
 	private Pinger pinger;
 	private String username;
 
-	ClientHandler(Socket client, Callback cb) {
+	ClientHandler(Socket client, ServerCall cb) {
 		this.client = client;
 		try {
 			this.in = new BufferedReader(new InputStreamReader(client.getInputStream()));

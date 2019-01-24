@@ -16,7 +16,7 @@ public class Server {
 		while (true) {
 			Socket clientSock = socket.accept();
 
-			ClientHandler handler = new ClientHandler(clientSock, new Callback() {
+			ClientHandler handler = new ClientHandler(clientSock, new ServerCall() {
 				@Override
 				public void onLogin(ClientHandler client) {
 					pool.add(client);

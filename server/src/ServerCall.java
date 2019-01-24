@@ -1,6 +1,6 @@
 import java.util.Set;
 
-public interface Callback {
+public interface ServerCall {
 	void onLogin(ClientHandler client);
 
 	void onDisconnect(ClientHandler client);
