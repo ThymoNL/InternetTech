@@ -13,6 +13,7 @@ public class Server {
 		System.out.println("Server listening on port " + socket.getLocalPort());
 		int threadCount = 0;
 
+		//noinspection InfiniteLoopStatement
 		while (true) {
 			Socket clientSock = socket.accept();
 
