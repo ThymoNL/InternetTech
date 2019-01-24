@@ -89,6 +89,14 @@ public class ServerCommands {
 				userList.append(',');
 		}
 
-		send("+OK " + userList.toString());
+		okPlain(userList.toString());
+	}
+
+	public void dm(String sender, String msg) {
+		send("DM " + sender + " "  + msg);
+	}
+
+	public void wspr(String group, String sender, String msg) {
+		send("WSPR " + group + " " + sender + " " + msg);
 	}
 }

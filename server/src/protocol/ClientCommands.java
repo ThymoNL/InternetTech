@@ -33,4 +33,16 @@ public class ClientCommands {
 	public String bcst(String data) throws UnexpectedCommandException {
 		return command("BCST", data);
 	}
+
+	public String dm(String data) throws UnexpectedCommandException {
+		return command("DM", data);
+	}
+
+	public String wspr(String data) throws UnexpectedCommandException {
+		return command("WSPR", data);
+	}
+
+	public String mkg(String data) throws UnexpectedCommandException {
+		return command("MKG", data);
+	}
 }

@@ -14,20 +14,20 @@ public class ClientHandler implements Runnable {
 	private Socket client;
 	private BufferedReader in;
 
-	private ServerCall cb;
+	private ServerCall call;
 	private ClientCommands parser;
 	private ServerCommands proto;
 	private Pinger pinger;
 	private String username;
 
-	ClientHandler(Socket client, ServerCall cb) {
+	ClientHandler(Socket client, ServerCall call) {
 		this.client = client;
 		try {
 			this.in = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			this.parser = ClientCommands.getParser();
 			this.proto = new ServerCommands(client.getInputStream(), client.getOutputStream());
 			this.pinger = new Pinger(client, in, () -> disconnect("Pong timeout"));
-			this.cb = cb;
+			this.call = call;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -44,8 +44,8 @@ public class ClientHandler implements Runnable {
 
 			if (username.matches(regularExpression)) {
 				proto.ok();
-				cb.onLogin(this);
-				new Thread(pinger).start();
+				call.onLogin(this);
+				//new Thread(pinger).start();
 				System.out.println(username + " logged in.");
 			} else {
 				proto.err("username has an invalid format");
@@ -60,15 +60,16 @@ public class ClientHandler implements Runnable {
 
 				String commandType = data.split(" ")[0];
 
+				String command;
 				switch (commandType) {
 					case "BCST":
 						String msg = parser.bcst(data);
 						System.out.println(username + " says: " + msg);
-						cb.onBroadcast(this, msg);
+						call.onBroadcast(this, msg);
 						proto.ok();
 						break;
 					case "LSU":
-						proto.lsu(cb.getClients());
+						proto.lsu(call.getClients());
 						break;
 					case "QUIT":
 						disconnect = true;
@@ -77,12 +78,34 @@ public class ClientHandler implements Runnable {
 					case "PONG":
 						pinger.pong();
 						break;
+					case "DM":
+						command = parser.dm(data);
+						String[] dm = command.split(" ", 2);
+						if (call.onDirectMessage(this, dm[0], dm[1])) // Did we sent the message?
+							proto.ok(command);
+						else
+							proto.err("User does not exist");
+						break;
+					case "WSPR":
+						command = parser.wspr(data);
+						String[] wspr = command.split(" ", 2);
+						if (call.onGroupMessage(this, wspr[0], wspr[1]))
+							proto.ok(command);
+						else
+							proto.err("Group does not exist");
+						break;
+					case "MKG":
+						//TODO: Check format
+						if (call.onGroupAdd(this, parser.mkg(data)))
+							proto.ok(data);
+						else
+							proto.err("Group exists");
 					default:
 						proto.err("Unknown command");
 				}
 			}
 
-			cb.onDisconnect(this);
+			call.onDisconnect(this);
 			client.close();
 		} catch (IOException | UnexpectedCommandException e) {
 			e.printStackTrace();
@@ -95,6 +118,14 @@ public class ClientHandler implements Runnable {
 
 	public synchronized void broadcast(String user, String msg) {
 		proto.bcst(user, msg);
+	}
+
+	public synchronized void tell(String sender, String msg) {
+		proto.dm(sender, msg);
+	}
+
+	public synchronized void groupTell(String group, String sender, String msg) {
+		proto.wspr(group, sender, msg);
 	}
 
 	private String receive() throws IOException {

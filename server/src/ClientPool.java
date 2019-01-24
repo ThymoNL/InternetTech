@@ -1,27 +1,34 @@
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 class ClientPool {
 	private Map<String, ClientHandler> clients = new HashMap<>();
 
-	void add(ClientHandler client) {
+	synchronized void add(ClientHandler client) {
 		clients.put(client.getUsername(), client);
 	}
 
-	void remove(ClientHandler client) {
+	synchronized void remove(ClientHandler client) {
 		clients.remove(client.getUsername());
 	}
 
-	Set<String> getUsers() {
+	synchronized Set<String> getUsers() {
 		return clients.keySet();
 	}
 
-	synchronized void tellAll(ClientHandler sender, String msg) {
-		for (int i = 0; i < clients.size(); i++) {
-			ClientHandler client = clients.get(i);
+	synchronized boolean tell(ClientHandler sender, String recipient, String msg) {
+		ClientHandler dest = clients.get(recipient);
+		if (dest == null) return false;
 
-			if (!client.equals(sender)) {
-				client.broadcast(sender.getUsername(), msg);
-			}
+		dest.tell(sender.getUsername(), msg);
+
+		return true;
+	}
+
+	synchronized void tellAll(ClientHandler sender, String msg) {
+		for (String s : clients.keySet()) {
+			clients.get(s).broadcast(sender.getUsername(), msg);
 		}
 	}
 }

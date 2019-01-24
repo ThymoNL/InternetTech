@@ -7,5 +7,11 @@ public interface ServerCall {
 
 	void onBroadcast(ClientHandler client, String msg);
 
+	boolean onDirectMessage(ClientHandler client, String recipient, String msg);
+
+	boolean onGroupAdd(ClientHandler client, String name);
+
+	boolean onGroupMessage(ClientHandler client, String group, String msg);
+
 	Set<String> getClients();
 }
