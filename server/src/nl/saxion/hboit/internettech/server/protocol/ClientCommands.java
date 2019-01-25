@@ -46,6 +46,10 @@ public class ClientCommands {
 		return command("MKG", data);
 	}
 
+	public String join(String data) throws UnexpectedCommandException {
+		return command("JOIN", data);
+	}
+
 	public String kick(String data) throws UnexpectedCommandException {
 		return command("KICK", data);
 	}

@@ -13,7 +13,7 @@ import java.net.SocketException;
 
 public class ClientHandler implements Runnable {
 	private static final String MOTD = "(>'-')> <('-'<) ^('-')^ v('-')v(>'-')> (^-^)";
-	private static final String regularExpression = "^([A-Za-z0-9_]+)";
+	private static final String alphanumeric = "^([A-Za-z0-9_]+)";
 
 	private Socket client;
 	private BufferedReader in;
@@ -46,7 +46,7 @@ public class ClientHandler implements Runnable {
 			proto.helo(MOTD);
 			username = parser.helo(receive()); // Wait for login
 
-			if (username.matches(regularExpression)) {
+			if (username.matches(alphanumeric)) {
 				proto.ok();
 				call.onLogin(this);
 				if (pinger != null) new Thread(pinger).start();
@@ -76,7 +76,7 @@ public class ClientHandler implements Runnable {
 						proto.okPlain("Goodbye");
 						break;
 					case "PONG":
-						pinger.pong();
+						if (pinger != null) pinger.pong();
 						break;
 					case "BCST":
 						String msg = parser.bcst(data);
@@ -113,6 +113,12 @@ public class ClientHandler implements Runnable {
 						else
 							proto.err("Group exists");
 						break;
+					case "JOIN":
+						if (call.onGroupJoin(this, parser.join(data)))
+							proto.ok(data);
+						else
+							proto.err("Group does not exist");
+						break;
 					default:
 						proto.err("Unknown command");
 				}
@@ -120,7 +126,11 @@ public class ClientHandler implements Runnable {
 
 			call.onDisconnect(this);
 			client.close();
-		} catch (IOException | UnexpectedCommandException e) {
+		} catch (UnexpectedCommandException e) {
+			disconnect(e.getMessage());
+			System.err.println("Unexpected command: " + e.getMessage());
+			System.err.println("Disconnecting client");
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

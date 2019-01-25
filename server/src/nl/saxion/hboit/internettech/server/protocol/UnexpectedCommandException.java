@@ -2,6 +2,7 @@ package nl.saxion.hboit.internettech.server.protocol;
 
 public class UnexpectedCommandException extends Exception {
 	public UnexpectedCommandException() {
+		super();
 	}
 
 	public UnexpectedCommandException(String message) {
