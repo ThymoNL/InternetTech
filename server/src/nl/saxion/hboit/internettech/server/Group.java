@@ -32,7 +32,7 @@ public class Group {
 	/**
 	 * Leave group
 	 * If the owner leaves a new one is assigned.
-	 * @param user User that wants to leave
+	 * @param user User that wants to lvg
 	 * @return true: left group, false: not in group
 	 * @author Thymo van Beers
 	 */

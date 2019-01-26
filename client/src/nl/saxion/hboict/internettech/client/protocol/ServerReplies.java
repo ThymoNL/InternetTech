@@ -31,14 +31,14 @@ public class ServerReplies {
 		Scanner scanner = new Scanner(System.in);
 		System.out.println("Please fill in your username:");
 		username = scanner.nextLine();
+		//scanner.close();
 
-		send("HELO " + username);
-
+		send("HELO " + username); //TODO: Use printwriter!
 	}
 
 	private void send(String data) {
 		try {
-			os.write(data.getBytes());
+			os.write((data + "\n").getBytes());
 			os.flush();
 		} catch (IOException e) {
 			e.printStackTrace();

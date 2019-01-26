@@ -119,6 +119,24 @@ public class ClientHandler implements Runnable {
 						else
 							proto.err("Group does not exist");
 						break;
+					case "LVG":
+						if (call.onGroupLeave(this, parser.lvg(data)))
+							proto.ok(data);
+						else
+							proto.err("Not in group");
+						break;
+					case "KICK":
+						command = parser.kick(data);
+						String[] kick = command.split(" ", 2);
+						try {
+							if (call.onGroupKick(this, kick[0], kick[1]))
+								proto.ok(command);
+							else
+								proto.err("Not in group");
+						} catch (ClientNotOwnerException e) {
+							proto.err("Not owner");
+						}
+						break;
 					default:
 						proto.err("Unknown command");
 				}

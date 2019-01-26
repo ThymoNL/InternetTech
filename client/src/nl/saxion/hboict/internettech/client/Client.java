@@ -6,7 +6,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 
 public class Client {
@@ -53,14 +55,24 @@ public class Client {
 		}
 	}
 
-	private void init(String host, int port, boolean log) throws UnknownHostException {
+	/**
+	 * Initializes connection to server
+	 * @param host
+	 * @param port
+	 * @param log
+	 * @throws IOException UnknownHostException or SocketException
+	 */
+	private void init(String host, int port, boolean log) throws IOException {
 		try {
 			socket = new Socket(host, port);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			os = socket.getOutputStream();
 			replies = new ServerReplies(os);
+		} catch (UnknownHostException | ConnectException e) {
+			throw e;
 		} catch (IOException e) {
 			e.printStackTrace();
+			return;
 		}
 
 		loop(log);

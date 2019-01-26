@@ -50,6 +50,10 @@ public class ClientCommands {
 		return command("JOIN", data);
 	}
 
+	public String lvg(String data) throws UnexpectedCommandException {
+		return command("LVG", data);
+	}
+
 	public String kick(String data) throws UnexpectedCommandException {
 		return command("KICK", data);
 	}
