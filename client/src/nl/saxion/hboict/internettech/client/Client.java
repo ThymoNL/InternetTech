@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 
 public class Client {
@@ -57,6 +56,7 @@ public class Client {
 
 	/**
 	 * Initializes connection to server
+	 *
 	 * @param host
 	 * @param port
 	 * @param log
@@ -67,7 +67,7 @@ public class Client {
 			socket = new Socket(host, port);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			os = socket.getOutputStream();
-			replies = new ServerReplies(os);
+			replies = new ServerReplies(socket.getOutputStream());
 		} catch (UnknownHostException | ConnectException e) {
 			throw e;
 		} catch (IOException e) {
@@ -87,24 +87,13 @@ public class Client {
 					System.out.println(line); //TODO: Add color
 				}
 
-				if (line.equals("PING")) {
-					send("PONG");
-				} else if (line.startsWith("DSCN")) {
+				if (line.startsWith("DSCN")) {
 					socket.close();
 					break;
 				} else {
 					replies.parse(line);
 				}
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void send(String s) {
-		try {
-			os.write(s.getBytes());
-			os.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
