@@ -12,7 +12,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 public class ClientHandler implements Runnable {
-	private static final String MOTD = "(>'-')> <('-'<) ^('-')^ v('-')v(>'-')> (^-^)";
+	private static final String MOTD = "(>'-')> <('-'<) ^('-')^ v('-')v (>'-')> (^-^)";
 	private static final String alphanumeric = "^([A-Za-z0-9_]+)";
 
 	private Socket client;
