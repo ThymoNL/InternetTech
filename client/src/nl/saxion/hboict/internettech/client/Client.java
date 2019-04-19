@@ -1,101 +1,249 @@
 package nl.saxion.hboict.internettech.client;
 
-import nl.saxion.hboict.internettech.client.protocol.ServerReplies;
+import nl.saxion.hboict.internettech.client.color.ANSIColor;
+import nl.saxion.hboict.internettech.client.messages.ClientMessage;
+import nl.saxion.hboict.internettech.client.messages.ServerMessage;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.ConnectException;
+import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.Scanner;
+import java.util.Stack;
 
 public class Client {
+	private String host;
+	private int port;
+	private boolean log;
+	private boolean connected;
+
 	private Socket socket;
-	private BufferedReader in;
-	private OutputStream os;
-	private ServerReplies replies;
+	private ServerReader readerThread;
+	private ServerWriter writerThread;
+	private NonblockingBufferedReader nonblockReader;
 
-	public static void main(String[] args) {
-		String host = "localhost";
-		int port = 1337;
-		boolean log = true;
+	private Stack<ClientMessage> clientMessages;
+	private Stack<ServerMessage> serverMessages;
 
-		for (int i = 0; i < args.length; i++) {
-			switch (args[i]) {
-				case "-h":
-				case "--host":
-					host = args[i + 1];
-					break;
-				case "-p":
-				case "--port":
-					port = Integer.parseInt(args[i + 1]);
-					break;
-				case "--no-logs":
-					log = false;
-					break;
-				case "--usage":
-				case "--help":
-					System.out.println("Usage: chat-client [-h|--host HOSTNAME] [-p|--port PORT]");
-					System.out.println("\t\t--no-logs: don't show the messages from and to the server in the console.");
-					return;
-			}
-		}
+	public Client(String host, int port, boolean log) {
+		this.host = host;
+		this.port = port;
+		this.log = log;
 
-		if (port < 1 || port > 65535) {
-			System.err.println("Invalid port!");
-			return;
-		}
-
-		try {
-			new Client().init(host, port, log);
-		} catch (IOException e) {
-			System.err.println("Could not connect to host");
-		}
+		this.clientMessages = new Stack<>();
+		this.serverMessages = new Stack<>();
 	}
 
 	/**
 	 * Initializes connection to server
 	 *
-	 * @param host
-	 * @param port
-	 * @param log
-	 * @throws IOException UnknownHostException or SocketException
 	 */
-	private void init(String host, int port, boolean log) throws IOException {
+	public void start() {
 		try {
-			socket = new Socket(host, port);
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			os = socket.getOutputStream();
-			replies = new ServerReplies(socket.getOutputStream());
-		} catch (UnknownHostException | ConnectException e) {
-			throw e;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
+			this.socket = new Socket(host, port);
 
-		loop(log);
-	}
+			InputStream is = socket.getInputStream();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+			readerThread = new ServerReader(reader);
+			new Thread(readerThread).start();
 
-	private void loop(boolean log) {
-		try {
+			OutputStream os = socket.getOutputStream();
+			PrintWriter writer = new PrintWriter(os);
+			writerThread = new ServerWriter(writer);
+			new Thread(writerThread).start();
+
+			//noinspection InfiniteLoopStatement
 			while (true) {
-				String line = in.readLine();
+				if (!serverMessages.empty()) { // Wait for initial message
+					ServerMessage serverMessage = serverMessages.pop();
+					if (!serverMessage.getMessageType().equals(ServerMessage.MessageType.HELO)) {
+						System.err.println("Expecting a HELO message but received: " + serverMessage.toString());
+					} else {
+						System.out.print("Please enter your username: ");
+						Scanner scanner = new Scanner(System.in);
+						String username = scanner.nextLine();
+						ClientMessage heloMessage = new ClientMessage(ClientMessage.MessageType.HELO, username);
+						clientMessages.push(heloMessage);
 
-				if (log) {
-					System.out.println(line); //TODO: Add color
-				}
+						while (serverMessages.empty()) {
+							// TODO: Maybe sleep for x times and then error out?
+							//Thread.sleep(50); // Wait for the server to respond
+						}
 
-				if (line.startsWith("DSCN")) {
-					socket.close();
+						connected = validateServerMessage(heloMessage, serverMessages.pop());
+
+						if (!connected) {
+							System.err.println("Error logging into server");
+						} else {
+							System.out.println("Connected to server.");
+							System.out.println("Enter '/quit' to disconnect.");
+							System.out.println("Type a broadcast message:");
+							nonblockReader = new NonblockingBufferedReader(new BufferedReader(new InputStreamReader(System.in)));
+
+							while (connected) {
+								String line = nonblockReader.readLine();
+								if (line != null) {
+									ClientMessage clientMessage;
+									if (line.equals("/quit")) {
+										clientMessage = new ClientMessage(ClientMessage.MessageType.QUIT, "");
+										connected = false;
+										Thread.sleep(500); // Wait for server confirmation
+									} else {
+										clientMessage = new ClientMessage(ClientMessage.MessageType.BCST, line);
+									}
+
+									clientMessages.push(clientMessage);
+									if (connected) System.out.println("Type a broadcast message: ");
+								}
+
+								if (!serverMessages.empty()) {
+									ServerMessage received = serverMessages.pop();
+									if (received.getMessageType().equals(ServerMessage.MessageType.BCST)) {
+										System.out.println(received.getPayload());
+									}
+								}
+							}
+
+							disconnect();
+							System.out.println("Disconnected.");
+						}
+					}
 					break;
-				} else {
-					replies.parse(line);
+				} else { // No HELO yet, sleep for a bit
+					//TODO: Maybe sleep for x times and then error out?
+					//Thread.sleep(50);
 				}
 			}
 		} catch (IOException e) {
+			System.err.println("Error connecting to server.");
+		} catch (InterruptedException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private boolean validateServerMessage(ClientMessage clientMessage, ServerMessage serverMessage) {
+		boolean valid = false;
+
+		try {
+			byte[] hash = MessageDigest.getInstance("MD5").digest(clientMessage.toString().getBytes());
+			String encodedHash = new String(Base64.getEncoder().encode(hash));
+			if (serverMessage.getMessageType().equals(ServerMessage.MessageType.OK) && encodedHash.equals(serverMessage.getPayload())) {
+				valid = true;
+			}
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+
+		return valid;
+	}
+
+	private void disconnect() {
+		if (readerThread != null)
+			readerThread.kill();
+
+		if (writerThread != null)
+			writerThread.kill();
+
+		if (nonblockReader != null)
+			nonblockReader.close();
+
+		connected = false;
+	}
+
+	private class ServerWriter implements Runnable {
+		private volatile boolean running = true;
+		private PrintWriter writer;
+
+		ServerWriter(PrintWriter writer) {
+			this.writer = writer;
+		}
+
+		@Override
+		public void run() {
+			while (this.running) {
+				if (!clientMessages.empty()) {
+					write(clientMessages.pop());
+				} else {
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+		private void write(ClientMessage msg) {
+			String line = msg.toString();
+			if (log) {
+				System.out.println(ANSIColor.GREEN + "<< " + line + ANSIColor.RESET);
+			}
+
+			writer.println(line);
+			writer.flush();
+		}
+
+		public void kill() {
+			running = false;
+		}
+	}
+
+	private class ServerReader implements Runnable {
+		private volatile boolean running = true;
+		private BufferedReader reader;
+
+		ServerReader(BufferedReader reader) {
+			this.reader = reader;
+		}
+
+		@Override
+		public void run() {
+			int errors = 0;
+			while (this.running) {
+				String line = read();
+
+				if (line == null) {
+					errors++;
+
+					if (errors >= 3)
+						disconnect();
+				} else {
+					ServerMessage message = new ServerMessage(line);
+
+					if (message.getMessageType().equals(ServerMessage.MessageType.PING)) {
+						ClientMessage pongMessage = new ClientMessage(ClientMessage.MessageType.PONG, "");
+						clientMessages.push(pongMessage);
+					}
+
+					if (message.getMessageType().equals(ServerMessage.MessageType.DSCN)) {
+						System.out.println("Client disconnected by server.");
+						disconnect();
+					}
+
+					serverMessages.push(message);
+					errors = 0;
+				}
+			}
+		}
+
+		private String read() {
+			String line = null;
+
+			try {
+				line = reader.readLine();
+				if (line != null && log) {
+					System.out.println(ANSIColor.RED + ">> " + line + ANSIColor.RESET);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			return line;
+		}
+
+		public void kill() {
+			running = false;
 		}
 	}
 }
