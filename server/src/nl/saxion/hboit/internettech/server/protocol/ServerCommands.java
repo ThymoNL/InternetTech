@@ -82,11 +82,11 @@ public class ServerCommands {
 	}
 
 	public void lsu(Set<String> set) {
-		okPlain(makeList(set));
+		send("LSU " + makeList(set));
 	}
 
 	public void lsg(Set<String> set) {
-		okPlain(makeList(set));
+		send("LSG " + makeList(set));
 	}
 
 	public void dm(String sender, String msg) {

@@ -44,7 +44,12 @@ public class ClientHandler implements Runnable {
 
 		try {
 			proto.helo(MOTD);
-			username = parser.helo(receive()); // Wait for login
+			String received = receive();
+
+			if (received == null)
+				return;
+
+			username = parser.helo(received); // Wait for login
 
 			if (username.matches(alphanumeric)) {
 				proto.ok();
