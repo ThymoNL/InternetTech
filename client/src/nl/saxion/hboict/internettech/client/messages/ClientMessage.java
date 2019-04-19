@@ -31,7 +31,7 @@ public class ClientMessage {
 		LSG,
 		JOIN,
 		WSPR,
-		LEAVE,
+		LVG,
 		KICK,
 
 		PONG,

@@ -76,8 +76,9 @@ public class Client {
 							System.err.println("Error logging into server");
 						} else {
 							System.out.println("Connected to server.");
-							System.out.println("Enter '/quit' to disconnect.");
-							System.out.println("Type a broadcast message:");
+							System.out.println("Commands start with '/'");
+							System.out.println("Enter '/help' to list commands.");
+							System.out.println("Otherwise enter a message to send globally:");
 							nonblockReader = new NonblockingBufferedReader(new BufferedReader(new InputStreamReader(System.in)));
 
 							while (connected) {
@@ -101,9 +102,11 @@ public class Client {
 									} else if (line.startsWith("/whisper")) {
 										clientMessage = new ClientMessage(ClientMessage.MessageType.WSPR, line);
 									} else if (line.startsWith("/leave")) {
-										clientMessage = new ClientMessage(ClientMessage.MessageType.LEAVE, line);
+										clientMessage = new ClientMessage(ClientMessage.MessageType.LVG, line);
 									} else if (line.startsWith("/kick")) {
 										clientMessage = new ClientMessage(ClientMessage.MessageType.KICK, line);
+									} else if (line.startsWith("/help")) {
+										printHelp();
 									} else if (line.startsWith("/")) { // Catch-all
 										System.out.println("Invalid command");
 									} else {
@@ -111,7 +114,6 @@ public class Client {
 									}
 
 									if (clientMessage != null) clientMessages.push(clientMessage);
-									if (connected) System.out.println("Type a broadcast message: ");
 								}
 
 								if (!serverMessages.empty()) {
@@ -168,6 +170,18 @@ public class Client {
 		connected = false;
 	}
 
+	private void printHelp() {
+		System.out.println("Following commands are available:");
+		System.out.println("\t/lsu						-> List all online users");
+		System.out.println("\t/dm $user $msg				-> Send a direct message to someone");
+		System.out.println("\t/kick $group $user			-> Kick a user from a group");
+		System.out.println("\t/lsg						-> List all groups");
+		System.out.println("\t/mkg $name					-> Create a group");
+		System.out.println("\t/join $group				-> Join a group");
+		System.out.println("\t/whisper $group $message	-> Send a message to a group");
+		System.out.println("\t/leave $group				-> Leave a group");
+	}
+
 	private class ServerWriter implements Runnable {
 		private volatile boolean running = true;
 		private PrintWriter writer;
@@ -201,7 +215,7 @@ public class Client {
 			writer.flush();
 		}
 
-		public void kill() {
+		void kill() {
 			running = false;
 		}
 	}
@@ -259,7 +273,7 @@ public class Client {
 			return line;
 		}
 
-		public void kill() {
+		void kill() {
 			running = false;
 		}
 	}
