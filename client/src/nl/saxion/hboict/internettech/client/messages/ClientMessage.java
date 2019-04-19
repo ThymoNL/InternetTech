@@ -4,22 +4,37 @@ public class ClientMessage {
 	private ClientMessage.MessageType type;
 	private String line;
 
+	public ClientMessage(ClientMessage.MessageType type) {
+		this.type = type;
+		this.line = "";
+	}
+
 	public ClientMessage(ClientMessage.MessageType type, String line) {
 		this.type = type;
-		this.line = line;
+
+		if (line.startsWith("/"))
+			this.line = line.substring(line.indexOf(" ")); // Remove command from line
+		else
+			this.line = line;
 	}
 
 	public String toString() {
 		return this.type + " " + this.line;
 	}
 
-	public static enum MessageType {
+	public enum MessageType {
 		HELO,
 		BCST,
-		PONG,
-		QUIT;
+		LSU,
+		DM,
+		MKG,
+		LSG,
+		JOIN,
+		WSPR,
+		LEAVE,
+		KICK,
 
-		private MessageType() {
-		}
+		PONG,
+		QUIT
 	}
 }

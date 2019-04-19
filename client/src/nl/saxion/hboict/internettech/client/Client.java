@@ -37,7 +37,6 @@ public class Client {
 
 	/**
 	 * Initializes connection to server
-	 *
 	 */
 	public void start() {
 		try {
@@ -84,16 +83,34 @@ public class Client {
 							while (connected) {
 								String line = nonblockReader.readLine();
 								if (line != null) {
-									ClientMessage clientMessage;
+									ClientMessage clientMessage = null;
 									if (line.equals("/quit")) {
-										clientMessage = new ClientMessage(ClientMessage.MessageType.QUIT, "");
+										clientMessage = new ClientMessage(ClientMessage.MessageType.QUIT);
 										connected = false;
 										Thread.sleep(500); // Wait for server confirmation
+									} else if (line.startsWith("/lsu")) {
+										clientMessage = new ClientMessage(ClientMessage.MessageType.LSU);
+									} else if (line.startsWith("/lsg")) {
+										clientMessage = new ClientMessage(ClientMessage.MessageType.LSG);
+									} else if (line.startsWith("/mkg")) {
+										clientMessage = new ClientMessage(ClientMessage.MessageType.MKG, line);
+									} else if (line.startsWith("/dm")) {
+										clientMessage = new ClientMessage(ClientMessage.MessageType.DM, line);
+									} else if (line.startsWith("/join")) {
+										clientMessage = new ClientMessage(ClientMessage.MessageType.JOIN, line);
+									} else if (line.startsWith("/whisper")) {
+										clientMessage = new ClientMessage(ClientMessage.MessageType.WSPR, line);
+									} else if (line.startsWith("/leave")) {
+										clientMessage = new ClientMessage(ClientMessage.MessageType.LEAVE, line);
+									} else if (line.startsWith("/kick")) {
+										clientMessage = new ClientMessage(ClientMessage.MessageType.KICK, line);
+									} else if (line.startsWith("/")) { // Catch-all
+										System.out.println("Invalid command");
 									} else {
 										clientMessage = new ClientMessage(ClientMessage.MessageType.BCST, line);
 									}
 
-									clientMessages.push(clientMessage);
+									if (clientMessage != null) clientMessages.push(clientMessage);
 									if (connected) System.out.println("Type a broadcast message: ");
 								}
 
@@ -105,7 +122,7 @@ public class Client {
 								}
 							}
 
-							disconnect();
+							disconnect(); // FIXME: Not all threads exit
 							System.out.println("Disconnected.");
 						}
 					}
@@ -212,7 +229,7 @@ public class Client {
 					ServerMessage message = new ServerMessage(line);
 
 					if (message.getMessageType().equals(ServerMessage.MessageType.PING)) {
-						ClientMessage pongMessage = new ClientMessage(ClientMessage.MessageType.PONG, "");
+						ClientMessage pongMessage = new ClientMessage(ClientMessage.MessageType.PONG);
 						clientMessages.push(pongMessage);
 					}
 

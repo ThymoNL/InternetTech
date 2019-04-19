@@ -54,13 +54,19 @@ public class ServerMessage {
 	public enum MessageType {
 		HELO,
 		BCST,
+		LSU,
+		DM,
+		MKG,
+		LSG,
+		JOIN,
+		WSPR,
+		LEAVE,
+		KICK,
+
 		PING,
 		DSCN,
 		OK,
 		ERR,
-		UNKOWN;
-
-		private MessageType() {
-		}
+		UNKOWN
 	}
 }
