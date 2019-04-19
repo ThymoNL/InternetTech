@@ -52,7 +52,6 @@ public class Client {
 			writerThread = new ServerWriter(writer);
 			new Thread(writerThread).start();
 
-			//noinspection InfiniteLoopStatement
 			while (true) {
 				if (!serverMessages.empty()) { // Wait for initial message
 					ServerMessage serverMessage = serverMessages.pop();
