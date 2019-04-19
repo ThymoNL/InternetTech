@@ -13,7 +13,7 @@ public class ClientMessage {
 		this.type = type;
 
 		if (line.startsWith("/"))
-			this.line = line.substring(line.indexOf(" ")); // Remove command from line
+			this.line = line.substring(line.indexOf(" ") + 1); // Remove command from line
 		else
 			this.line = line;
 	}
