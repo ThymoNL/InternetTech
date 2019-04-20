@@ -23,6 +23,8 @@ public class ClientHandler implements Runnable {
 	private ServerCommands proto;
 	private Pinger pinger;
 	private String username;
+	private String pendingRequest = ""; // Which client are we requesting a transfer too?
+	private String acceptFrom = ""; // What client are we accepting from?
 
 	ClientHandler(Socket client, ServerCall call, boolean ping) {
 		this.client = client;
@@ -142,6 +144,21 @@ public class ClientHandler implements Runnable {
 							proto.err("Not owner");
 						}
 						break;
+					case "RQFT":
+						command = parser.rqft(data);
+						String[] rqft = command.split(" ", 3);
+						if (call.onFileTransferRequest(this, rqft[0], rqft[1], Integer.parseInt(rqft[2]))) {
+							pendingRequest = rqft[0];
+						} else {
+							proto.rft("Client does not exist");
+						}
+						break;
+					case "AFT":
+						call.onTransferAccepted(acceptFrom, client.getInetAddress().getHostAddress());
+						break;
+					case "RFT":
+						command = parser.rft(data); // Reason for rejection
+						call.onTransferRejected(acceptFrom, command);
 					default:
 						proto.err("Unknown command");
 				}
@@ -176,6 +193,19 @@ public class ClientHandler implements Runnable {
 
 	public void kick(String name, String kickedBy) {
 		proto.kick(name, kickedBy);
+	}
+
+	public void requestTransfer(String requester, String name, int size) {
+		acceptFrom = requester;
+		proto.rqft(requester, name, size);
+	}
+
+	public void acceptedTransfer(String ip) {
+		proto.aft(ip);
+	}
+
+	public void rejectedTransfer(String reason) {
+		proto.rft(reason);
 	}
 
 	private String receive() throws IOException {

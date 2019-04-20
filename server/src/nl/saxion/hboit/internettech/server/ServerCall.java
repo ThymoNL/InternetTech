@@ -21,6 +21,12 @@ public interface ServerCall {
 
 	boolean onGroupKick(ClientHandler client, String group, String kickUser) throws ClientNotOwnerException;
 
+	boolean onFileTransferRequest(ClientHandler client, String user, String file, int size);
+
+	void onTransferAccepted(String client, String ip);
+
+	void onTransferRejected(String client, String reason);
+
 	Set<String> getClients();
 
 	Set<String> getGroups();

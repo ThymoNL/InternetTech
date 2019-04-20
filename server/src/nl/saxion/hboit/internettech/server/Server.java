@@ -10,28 +10,28 @@ import java.util.Set;
 public class Server {
 	private static final int PORT = 1337;
 
-	private static ClientPool pool = new ClientPool();
+	private static ClientPool clients = new ClientPool();
 	private static Map<String, Group> groups = new HashMap<>();
 
 	private static ServerCall serverCall = new ServerCall() {
 		@Override
 		public void onLogin(ClientHandler client) {
-			pool.add(client);
+			clients.add(client);
 		}
 
 		@Override
 		public void onDisconnect(ClientHandler client) {
-			pool.remove(client);
+			clients.remove(client);
 		}
 
 		@Override
 		public void onBroadcast(ClientHandler client, String msg) {
-			pool.tellAll(client, msg);
+			clients.tellAll(client, msg);
 		}
 
 		@Override
 		public boolean onDirectMessage(ClientHandler client, String recipient, String msg) {
-			return pool.tell(client, recipient, msg);
+			return clients.tell(client, recipient, msg);
 		}
 
 		@Override
@@ -86,8 +86,23 @@ public class Server {
 		}
 
 		@Override
+		public boolean onFileTransferRequest(ClientHandler client, String user, String file, int size) {
+			return clients.requestTransfer(client, user, file, size);
+		}
+
+		@Override
+		public void onTransferAccepted(String client, String ip) {
+			clients.transferAccept(client, ip);
+		}
+
+		@Override
+		public void onTransferRejected(String client, String reason) {
+			clients.transferReject(client, reason);
+		}
+
+		@Override
 		public Set<String> getClients() {
-			return pool.getNames();
+			return clients.getNames();
 		}
 
 		@Override

@@ -100,4 +100,16 @@ public class ServerCommands {
 	public void kick(String name, String kickedBy) {
 		send("KICK " + name + " "+ kickedBy);
 	}
+
+	public void rqft(String user, String file, int size) {
+		send("RQFT " + user + " " + file + " " + size);
+	}
+
+	public void aft(String ip) {
+		send("AFT " + ip);
+	}
+
+	public void rft(String reason) {
+		send("RFT " + reason);
+	}
 }

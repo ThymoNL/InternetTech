@@ -57,4 +57,12 @@ public class ClientCommands {
 	public String kick(String data) throws UnexpectedCommandException {
 		return command("KICK", data);
 	}
+
+	public String rqft(String data) throws UnexpectedCommandException {
+		return command("RQFT", data);
+	}
+
+	public String rft(String data) throws UnexpectedCommandException {
+		return command("RFT", data);
+	}
 }
