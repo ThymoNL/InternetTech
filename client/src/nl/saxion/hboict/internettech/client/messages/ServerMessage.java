@@ -62,6 +62,9 @@ public class ServerMessage {
 		WSPR,
 		LEAVE,
 		KICK,
+		RQFT,
+		AFT,
+		RFT,
 
 		PING,
 		DSCN,

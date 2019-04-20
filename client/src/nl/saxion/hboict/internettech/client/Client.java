@@ -88,23 +88,23 @@ public class Client {
 										clientMessage = new ClientMessage(ClientMessage.MessageType.QUIT);
 										connected = false;
 										Thread.sleep(500); // Wait for server confirmation
-									} else if (line.startsWith("/lsu")) {
+									} else if (line.startsWith("/lsu ")) {
 										clientMessage = new ClientMessage(ClientMessage.MessageType.LSU);
-									} else if (line.startsWith("/lsg")) {
+									} else if (line.startsWith("/lsg ")) {
 										clientMessage = new ClientMessage(ClientMessage.MessageType.LSG);
-									} else if (line.startsWith("/mkg")) {
+									} else if (line.startsWith("/mkg ")) {
 										clientMessage = new ClientMessage(ClientMessage.MessageType.MKG, line);
-									} else if (line.startsWith("/dm")) {
+									} else if (line.startsWith("/dm ")) {
 										clientMessage = new ClientMessage(ClientMessage.MessageType.DM, line);
-									} else if (line.startsWith("/join")) {
+									} else if (line.startsWith("/join ")) {
 										clientMessage = new ClientMessage(ClientMessage.MessageType.JOIN, line);
-									} else if (line.startsWith("/whisper")) {
+									} else if (line.startsWith("/whisper ")) {
 										clientMessage = new ClientMessage(ClientMessage.MessageType.WSPR, line);
-									} else if (line.startsWith("/leave")) {
+									} else if (line.startsWith("/leave ")) {
 										clientMessage = new ClientMessage(ClientMessage.MessageType.LVG, line);
-									} else if (line.startsWith("/kick")) {
+									} else if (line.startsWith("/kick ")) {
 										clientMessage = new ClientMessage(ClientMessage.MessageType.KICK, line);
-									} else if (line.startsWith("/help")) {
+									} else if (line.startsWith("/help ")) {
 										printHelp();
 									} else if (line.startsWith("/")) { // Catch-all
 										System.out.println("Invalid command");
@@ -117,8 +117,26 @@ public class Client {
 
 								if (!serverMessages.empty()) {
 									ServerMessage received = serverMessages.pop();
-									if (received.getMessageType().equals(ServerMessage.MessageType.BCST)) {
-										System.out.println(received.getPayload());
+
+									switch (received.getMessageType()) {
+										case BCST:
+											System.out.println(received.getPayload());
+											break;
+										case LSU:
+											System.out.println("Online users: " + received.getPayload());
+											break;
+										case LSG:
+											System.out.println("Groups: " + received.getPayload());
+											break;
+										case DM: // TODO: Split user and message
+											System.out.println("DM:" + received.getPayload());
+											break;
+										case WSPR: // TODO: Implement
+											System.out.println("Group: User> msg");
+											break;
+										case KICK: // TODO: Implement
+											System.out.println("Kicked from $group by $user");
+											break;
 									}
 								}
 							}
@@ -171,14 +189,14 @@ public class Client {
 
 	private void printHelp() {
 		System.out.println("Following commands are available:");
-		System.out.println("\t/lsu						-> List all online users");
-		System.out.println("\t/dm $user $msg				-> Send a direct message to someone");
-		System.out.println("\t/kick $group $user			-> Kick a user from a group");
-		System.out.println("\t/lsg						-> List all groups");
-		System.out.println("\t/mkg $name					-> Create a group");
-		System.out.println("\t/join $group				-> Join a group");
-		System.out.println("\t/whisper $group $message	-> Send a message to a group");
-		System.out.println("\t/leave $group				-> Leave a group");
+		System.out.println("\t/lsu\t\t\t\t\t\t-> List all online users");
+		System.out.println("\t/dm $user $msg\t\t\t\t-> Send a direct message to someone");
+		System.out.println("\t/kick $group $user\t\t\t-> Kick a user from a group");
+		System.out.println("\t/lsg\t\t\t\t\t\t-> List all groups");
+		System.out.println("\t/mkg $name\t\t\t\t\t-> Create a group");
+		System.out.println("\t/join $group\t\t\t\t-> Join a group");
+		System.out.println("\t/whisper $group $message\t-> Send a message to a group");
+		System.out.println("\t/leave $group\t\t\t\t-> Leave a group");
 	}
 
 	private class ServerWriter implements Runnable {

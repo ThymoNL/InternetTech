@@ -33,6 +33,9 @@ public class ClientMessage {
 		WSPR,
 		LVG,
 		KICK,
+		RQFT,
+		AFT,
+		RFT,
 
 		PONG,
 		QUIT
